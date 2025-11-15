@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Mindfolio</title>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-full">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div class="sm:mx-auto sm:w-full sm:max-w-md">
+            <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+                Mindfolio
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Create your personal reading library
+            </p>
+        </div>
+
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+            <div class="card px-4 py-8 sm:px-10">
+                <h3 class="text-xl font-semibold mb-6">Create your account</h3>
+
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="rounded-md {% if message.tags == 'error' %}bg-red-50 border border-red-200{% else %}bg-blue-50 border border-blue-200{% endif %} p-4 mb-2">
+                        <p class="text-sm {% if message.tags == 'error' %}text-red-800{% else %}text-blue-800{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form class="space-y-6" action="{% url 'register' %}" method="post">
+                    {% csrf_token %}
+
+                    <div>
+                        <label for="id_username" class="label block mb-2">
+                            Username
+                        </label>
+                        <input type="text"
+                               name="username"
+                               id="id_username"
+                               autocomplete="username"
+                               required
+                               class="input">
+                        <p class="mt-1 text-xs text-gray-500">
+                            150 characters or fewer. Letters, digits and @/./+/-/_ only.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="id_password1" class="label block mb-2">
+                            Password
+                        </label>
+                        <input type="password"
+                               name="password1"
+                               id="id_password1"
+                               autocomplete="new-password"
+                               required
+                               class="input">
+                        <p class="mt-1 text-xs text-gray-500">
+                            Your password must contain at least 8 characters and can't be entirely numeric.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="id_password2" class="label block mb-2">
+                            Confirm Password
+                        </label>
+                        <input type="password"
+                               name="password2"
+                               id="id_password2"
+                               autocomplete="new-password"
+                               required
+                               class="input">
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary w-full">
+                            Create account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="bg-white px-2 text-gray-500">
+                                Already have an account?
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <a href="{% url 'login' %}" class="btn btn-outline w-full">
+                            Sign in
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<div class="space-y-4">
+    {% for note in book.notes.all %}
+    <div class="card p-4">
+        <div class="flex justify-between items-start mb-2">
+            <div class="flex-1">
+                <span class="badge badge-outline text-xs">{{ note.get_note_type_display }}</span>
+                {% if note.title %}
+                <h4 class="font-medium mt-2">{{ note.title }}</h4>
+                {% endif %}
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'note_edit' note.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
+                <button hx-delete="{% url 'note_delete' note.pk %}"
+                        hx-confirm="Are you sure?"
+                        hx-target="closest .space-y-4"
+                        class="text-sm text-red-600 hover:text-red-900">Delete</button>
+            </div>
+        </div>
+        <p class="text-sm text-gray-700 whitespace-pre-line">{{ note.body }}</p>
+        <p class="text-xs text-gray-500 mt-2">{{ note.created_at|date:"M d, Y" }}</p>
+    </div>
+    {% empty %}
+    <p class="text-gray-500 text-center py-8">No notes yet. Add your first note!</p>
+    {% endfor %}
+</div>

@@ -1,0 +1,35 @@
+<div class="space-y-4">
+    {% for quote in book.quotes.all %}
+    <div class="card p-4">
+        <div class="flex justify-between items-start mb-2">
+            <div class="flex-1">
+                {% if quote.page_number %}
+                <span class="text-xs text-gray-500">Page {{ quote.page_number }}</span>
+                {% endif %}
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'quote_edit' quote.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
+                <button hx-delete="{% url 'quote_delete' quote.pk %}"
+                        hx-confirm="Are you sure?"
+                        hx-target="closest .space-y-4"
+                        class="text-sm text-red-600 hover:text-red-900">Delete</button>
+            </div>
+        </div>
+        <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700">
+            {{ quote.quote_text }}
+        </blockquote>
+        {% if quote.my_comment %}
+        <p class="text-sm text-gray-600 mt-3">{{ quote.my_comment }}</p>
+        {% endif %}
+        {% if quote.tags.all %}
+        <div class="flex flex-wrap gap-1 mt-3">
+            {% for tag in quote.tags.all %}
+            <span class="badge badge-outline text-xs">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-gray-500 text-center py-8">No quotes yet. Add your first quote!</p>
+    {% endfor %}
+</div>

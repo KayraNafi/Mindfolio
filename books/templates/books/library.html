@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Library - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="md:flex md:items-center md:justify-between mb-8">
+            <div class="min-w-0 flex-1">
+                <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                    My Library
+                </h1>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div class="card p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-sm font-medium text-gray-500">Total Books</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.total }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-10 w-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-sm font-medium text-gray-500">Reading</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.reading }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-10 w-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-sm font-medium text-gray-500">Finished</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.finished }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-10 w-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-sm font-medium text-gray-500">To Read</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.to_read }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="card p-6 mb-6">
+            <form hx-get="{% url 'library' %}" hx-target="#books-list" hx-trigger="change, submit" hx-push-url="true">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                    <!-- Search -->
+                    <div class="lg:col-span-2">
+                        <label for="search" class="label block mb-2">Search</label>
+                        <input type="text"
+                               name="q"
+                               id="search"
+                               value="{{ search_query }}"
+                               placeholder="Search books, notes, quotes..."
+                               class="input">
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div>
+                        <label for="status" class="label block mb-2">Status</label>
+                        <select name="status" id="status" class="select">
+                            <option value="">All Status</option>
+                            <option value="TO_READ" {% if current_status == 'TO_READ' %}selected{% endif %}>To Read</option>
+                            <option value="READING" {% if current_status == 'READING' %}selected{% endif %}>Reading</option>
+                            <option value="FINISHED" {% if current_status == 'FINISHED' %}selected{% endif %}>Finished</option>
+                            <option value="ABANDONED" {% if current_status == 'ABANDONED' %}selected{% endif %}>Abandoned</option>
+                        </select>
+                    </div>
+
+                    <!-- Tag Filter -->
+                    <div>
+                        <label for="tag" class="label block mb-2">Tag</label>
+                        <select name="tag" id="tag" class="select">
+                            <option value="">All Tags</option>
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}" {% if current_tag == tag.id|stringformat:"s" %}selected{% endif %}>
+                                {{ tag.name }} ({{ tag.book_count }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Sort -->
+                    <div>
+                        <label for="sort" class="label block mb-2">Sort By</label>
+                        <select name="sort" id="sort" class="select">
+                            <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Recently Updated</option>
+                            <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Recently Added</option>
+                            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                            <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author (A-Z)</option>
+                            <option value="-overall_rating" {% if sort_by == '-overall_rating' %}selected{% endif %}>Rating (High-Low)</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Books Grid -->
+        <div id="books-list">
+            {% include 'books/partials/book_list.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

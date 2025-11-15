@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ book.title }} - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <!-- Back button -->
+        <div class="mb-6">
+            <a href="{% url 'library' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                ← Back to Library
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <!-- Left Column - Book Info -->
+            <div class="lg:col-span-1">
+                <div class="card sticky top-6">
+                    <!-- Cover -->
+                    <div class="aspect-[2/3] w-full overflow-hidden rounded-t-lg bg-gray-200">
+                        {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-full w-full object-cover">
+                        {% else %}
+                        <div class="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                            <svg class="h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="p-6">
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ book.title }}</h1>
+                        <p class="text-lg text-gray-600 mb-4">{{ book.author }}</p>
+
+                        {% if book.publication_year %}
+                        <p class="text-sm text-gray-500 mb-4">Published: {{ book.publication_year }}</p>
+                        {% endif %}
+
+                        <!-- Status -->
+                        <div class="mb-4">
+                            {% if book.status == 'READING' %}
+                            <span class="badge badge-default bg-blue-100 text-blue-800">Reading</span>
+                            {% elif book.status == 'FINISHED' %}
+                            <span class="badge badge-default bg-green-100 text-green-800">Finished</span>
+                            {% elif book.status == 'TO_READ' %}
+                            <span class="badge badge-default bg-yellow-100 text-yellow-800">To Read</span>
+                            {% elif book.status == 'ABANDONED' %}
+                            <span class="badge badge-default bg-gray-100 text-gray-800">Abandoned</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Rating -->
+                        {% if book.overall_rating %}
+                        <div class="mb-4">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    {% with book.overall_rating as rating %}
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= rating %}
+                                        <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                        {% else %}
+                                        <svg class="h-5 w-5 fill-current text-gray-300" viewBox="0 0 20 20">
+                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                        </svg>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% endwith %}
+                                </div>
+                                <span class="ml-2 text-sm font-medium text-gray-600">{{ book.overall_rating }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Dates -->
+                        {% if book.started_at or book.finished_at %}
+                        <div class="mb-4 text-sm text-gray-600 space-y-1">
+                            {% if book.started_at %}
+                            <p>Started: {{ book.started_at|date:"M d, Y" }}</p>
+                            {% endif %}
+                            {% if book.finished_at %}
+                            <p>Finished: {{ book.finished_at|date:"M d, Y" }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Tags -->
+                        {% if book.tags.all %}
+                        <div class="mb-4">
+                            <p class="text-xs font-medium text-gray-500 mb-2">Tags</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tag in book.tags.all %}
+                                <span class="badge badge-outline">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Actions -->
+                        <div class="space-y-2 pt-4 border-t">
+                            <a href="{% url 'book_edit' book.pk %}" class="btn btn-outline w-full">
+                                Edit Book
+                            </a>
+                            <a href="{% url 'book_delete' book.pk %}" class="btn btn-ghost w-full text-red-600 hover:bg-red-50">
+                                Delete Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Tabs -->
+            <div class="lg:col-span-2">
+                <!-- Tabs -->
+                <div class="card" x-data="{ activeTab: '{{ active_tab }}' }">
+                    <div class="border-b border-gray-200">
+                        <nav class="flex -mb-px" aria-label="Tabs">
+                            <button @click="activeTab = 'overview'"
+                                    :class="activeTab === 'overview' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                                Overview
+                            </button>
+                            <button @click="activeTab = 'notes'"
+                                    :class="activeTab === 'notes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                                Notes ({{ book.notes_count }})
+                            </button>
+                            <button @click="activeTab = 'quotes'"
+                                    :class="activeTab === 'quotes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                                Quotes ({{ book.quotes_count }})
+                            </button>
+                            <button @click="activeTab = 'files'"
+                                    :class="activeTab === 'files' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                                Files ({{ book.files_count }})
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-6">
+                        <!-- Overview Tab -->
+                        <div x-show="activeTab === 'overview'" x-cloak>
+                            <h3 class="text-lg font-semibold mb-4">Book Overview</h3>
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="card p-4 bg-gray-50">
+                                    <p class="text-sm text-gray-600">Notes</p>
+                                    <p class="text-2xl font-bold">{{ book.notes_count }}</p>
+                                </div>
+                                <div class="card p-4 bg-gray-50">
+                                    <p class="text-sm text-gray-600">Quotes</p>
+                                    <p class="text-2xl font-bold">{{ book.quotes_count }}</p>
+                                </div>
+                            </div>
+
+                            {% if book.notes.all %}
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-gray-900 mb-3">Latest Reflection</h4>
+                                {% with book.notes.all|first as latest_note %}
+                                <div class="card p-4 bg-gray-50">
+                                    <p class="text-xs text-gray-500 mb-1">{{ latest_note.get_note_type_display }}</p>
+                                    {% if latest_note.title %}
+                                    <p class="font-medium mb-2">{{ latest_note.title }}</p>
+                                    {% endif %}
+                                    <p class="text-sm text-gray-700">{{ latest_note.body|truncatewords:50 }}</p>
+                                </div>
+                                {% endwith %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Notes Tab -->
+                        <div x-show="activeTab === 'notes'" x-cloak>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Notes</h3>
+                                <a href="{% url 'note_create' book.pk %}" class="btn btn-sm btn-primary">Add Note</a>
+                            </div>
+
+                            <div class="space-y-4">
+                                {% for note in book.notes.all %}
+                                <div class="card p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1">
+                                            <span class="badge badge-outline text-xs">{{ note.get_note_type_display }}</span>
+                                            {% if note.title %}
+                                            <h4 class="font-medium mt-2">{{ note.title }}</h4>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <a href="{% url 'note_edit' note.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
+                                            <a href="{% url 'note_delete' note.pk %}" class="text-sm text-red-600 hover:text-red-900">Delete</a>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ note.body }}</p>
+                                    <p class="text-xs text-gray-500 mt-2">{{ note.created_at|date:"M d, Y" }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="text-gray-500 text-center py-8">No notes yet. Add your first note!</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Quotes Tab -->
+                        <div x-show="activeTab === 'quotes'" x-cloak>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Quotes</h3>
+                                <a href="{% url 'quote_create' book.pk %}" class="btn btn-sm btn-primary">Add Quote</a>
+                            </div>
+
+                            <div class="space-y-4">
+                                {% for quote in book.quotes.all %}
+                                <div class="card p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1">
+                                            {% if quote.page_number %}
+                                            <span class="text-xs text-gray-500">Page {{ quote.page_number }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <a href="{% url 'quote_edit' quote.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
+                                            <a href="{% url 'quote_delete' quote.pk %}" class="text-sm text-red-600 hover:text-red-900">Delete</a>
+                                        </div>
+                                    </div>
+                                    <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700">
+                                        {{ quote.quote_text }}
+                                    </blockquote>
+                                    {% if quote.my_comment %}
+                                    <p class="text-sm text-gray-600 mt-3">{{ quote.my_comment }}</p>
+                                    {% endif %}
+                                    {% if quote.tags.all %}
+                                    <div class="flex flex-wrap gap-1 mt-3">
+                                        {% for tag in quote.tags.all %}
+                                        <span class="badge badge-outline text-xs">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% empty %}
+                                <p class="text-gray-500 text-center py-8">No quotes yet. Add your first quote!</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Files Tab -->
+                        <div x-show="activeTab === 'files'" x-cloak>
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold">Files</h3>
+                                <a href="{% url 'book_file_upload' book.pk %}" class="btn btn-sm btn-primary">Upload File</a>
+                            </div>
+
+                            <div class="space-y-3">
+                                {% for file in book.files.all %}
+                                <div class="flex items-center justify-between p-3 card">
+                                    <div class="flex items-center">
+                                        <svg class="h-8 w-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">{{ file.original_filename }}</p>
+                                            <p class="text-xs text-gray-500">{{ file.get_file_type_display }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <a href="{% url 'book_file_view' file.pk %}" class="btn btn-sm btn-outline">View</a>
+                                        <a href="{% url 'book_file_delete' file.pk %}" class="btn btn-sm btn-ghost text-red-600">Delete</a>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-gray-500 text-center py-8">No files uploaded yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+[x-cloak] { display: none !important; }
+</style>
+{% endblock %}

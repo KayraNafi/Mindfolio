@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Book - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <a href="{% if book %}{% url 'book_detail' book.pk %}{% else %}{% url 'library' %}{% endif %}"
+               class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                ← Back
+            </a>
+        </div>
+
+        <div class="card p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ action }} Book</h1>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Title -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="label block mb-2">
+                        Title <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Author -->
+                <div>
+                    <label for="{{ form.author.id_for_label }}" class="label block mb-2">
+                        Author <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.author }}
+                    {% if form.author.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.author.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Two column layout -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <!-- Publication Year -->
+                    <div>
+                        <label for="{{ form.publication_year.id_for_label }}" class="label block mb-2">
+                            Publication Year
+                        </label>
+                        {{ form.publication_year }}
+                    </div>
+
+                    <!-- Primary Format -->
+                    <div>
+                        <label for="{{ form.primary_format.id_for_label }}" class="label block mb-2">
+                            Primary Format
+                        </label>
+                        {{ form.primary_format }}
+                    </div>
+                </div>
+
+                <!-- Reading Information -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                    <!-- Status -->
+                    <div>
+                        <label for="{{ form.status.id_for_label }}" class="label block mb-2">
+                            Status
+                        </label>
+                        {{ form.status }}
+                    </div>
+
+                    <!-- Started At -->
+                    <div>
+                        <label for="{{ form.started_at.id_for_label }}" class="label block mb-2">
+                            Started Date
+                        </label>
+                        {{ form.started_at }}
+                    </div>
+
+                    <!-- Finished At -->
+                    <div>
+                        <label for="{{ form.finished_at.id_for_label }}" class="label block mb-2">
+                            Finished Date
+                        </label>
+                        {{ form.finished_at }}
+                    </div>
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <label for="{{ form.overall_rating.id_for_label }}" class="label block mb-2">
+                        Rating (0.5 - 5.0)
+                    </label>
+                    {{ form.overall_rating }}
+                    <p class="mt-1 text-xs text-gray-500">Enter a rating between 0.5 and 5 (in 0.5 increments)</p>
+                </div>
+
+                <!-- Cover Image -->
+                <div>
+                    <label for="{{ form.cover_image.id_for_label }}" class="label block mb-2">
+                        Cover Image
+                    </label>
+                    {% if book and book.cover_image %}
+                    <div class="mb-3">
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-48 w-auto rounded-lg shadow">
+                    </div>
+                    {% endif %}
+                    {{ form.cover_image }}
+                </div>
+
+                <!-- Tags -->
+                <div>
+                    <label class="label block mb-2">Tags</label>
+                    <div class="space-y-2">
+                        {% for choice in form.tags %}
+                        <div class="flex items-center">
+                            {{ choice.tag }}
+                            <label for="{{ choice.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                {{ choice.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">
+                        Don't see your tag? You can create tags from the Django admin panel.
+                    </p>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-6 border-t">
+                    <a href="{% if book %}{% url 'book_detail' book.pk %}{% else %}{% url 'library' %}{% endif %}"
+                       class="btn btn-outline">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        {{ action }} Book
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
