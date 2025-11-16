@@ -6,7 +6,7 @@
                 <a href="{% url 'book_detail' quote.book.pk %}" class="text-sm font-semibold text-primary hover:underline">
                     {{ quote.book.title }}
                 </a>
-                <p class="text-xs text-muted-foreground">by {{ quote.book.author }}</p>
+                <p class="text-xs text-muted-foreground">by {{ quote.book.author.name|default:"Unknown" }}</p>
             </div>
             <div class="flex items-center gap-3 text-xs text-muted-foreground">
                 {% if quote.page_number %}

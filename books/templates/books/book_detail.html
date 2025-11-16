@@ -38,7 +38,7 @@
 
                     <div class="p-6">
                         <h1 class="text-2xl font-bold text-foreground mb-2">{{ book.title }}</h1>
-                        <p class="text-lg text-muted-foreground mb-4">{{ book.author }}</p>
+                        <p class="text-lg text-muted-foreground mb-4">{{ book.author.name|default:"Unknown" }}</p>
 
                         {% if book.publication_year %}
                         <p class="text-sm text-muted-foreground mb-4">Published: {{ book.publication_year }}</p>

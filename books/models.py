@@ -15,6 +15,20 @@ def book_file_path(instance, filename):
     return f"books/{instance.book.user.id}/{instance.book.id}/{filename}"
 
 
+class Author(models.Model):
+    """Author entity to prevent duplicates"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='authors')
+    name = models.CharField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        unique_together = ('user', 'name')
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     """Book model representing a book in the library"""
 
@@ -25,15 +39,9 @@ class Book(models.Model):
         ('ABANDONED', 'Abandoned'),
     ]
 
-    FORMAT_CHOICES = [
-        ('PDF', 'PDF'),
-        ('EPUB', 'EPUB'),
-        ('OTHER', 'Other'),
-    ]
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='books')
     title = models.CharField(max_length=500)
-    author = models.CharField(max_length=300)
+    author = models.ForeignKey('Author', on_delete=models.PROTECT, related_name='books', null=True, blank=True)
     publication_year = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='TO_READ')
     overall_rating = models.DecimalField(
@@ -45,7 +53,6 @@ class Book(models.Model):
     )
     started_at = models.DateField(null=True, blank=True)
     finished_at = models.DateField(null=True, blank=True)
-    primary_format = models.CharField(max_length=10, choices=FORMAT_CHOICES, default='PDF')
     cover_image = models.ImageField(upload_to=book_cover_path, null=True, blank=True)
     tags = models.ManyToManyField(Tag, related_name='books', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,7 +62,8 @@ class Book(models.Model):
         ordering = ['-updated_at']
 
     def __str__(self):
-        return f"{self.title} by {self.author}"
+        author_name = self.author.name if self.author else "Unknown"
+        return f"{self.title} by {author_name}"
 
     @property
     def notes_count(self):

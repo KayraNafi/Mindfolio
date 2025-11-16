@@ -1,0 +1,207 @@
+{% with is_modal=modal|default_if_none:False %}
+<div x-data="{
+        status: '{{ form.status.value|default:'TO_READ' }}' || 'TO_READ',
+        init() {
+            this.status = this.status || 'TO_READ';
+        },
+        handleStatusChange(value) {
+            this.status = value || 'TO_READ';
+            this.prefillDates();
+        },
+        prefillDates() {
+            const today = new Date().toISOString().slice(0, 10);
+            if ((this.status === 'READING' || this.status === 'FINISHED') && this.$refs.startedInput && !this.$refs.startedInput.value) {
+                this.$refs.startedInput.value = today;
+            }
+            if (this.status === 'FINISHED' && this.$refs.finishedInput && !this.$refs.finishedInput.value) {
+                this.$refs.finishedInput.value = today;
+            }
+        }
+    }">
+    <section class="space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">Basics</h2>
+        <div class="space-y-6">
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="block mb-2 text-sm font-medium">
+                    Title <span class="text-destructive">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p class="mt-1 text-sm text-destructive">{{ form.title.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div>
+                                <label for="{{ form.author_name.id_for_label }}" class="block mb-2 text-sm font-medium">
+                                    Author <span class="text-destructive">*</span>
+                                </label>
+                                {{ form.author_name }}
+                        {% if form.author_name.errors %}
+                        <p class="mt-1 text-sm text-destructive">{{ form.author_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% if author_suggestions %}
+                    <datalist id="author-suggestions">
+                        {% for name in author_suggestions %}
+                        <option value="{{ name }}">
+                        {% endfor %}
+                    </datalist>
+                    {% endif %}
+                <div>
+                    <label for="{{ form.publication_year.id_for_label }}" class="block mb-2 text-sm font-medium">
+                        Publication Year
+                    </label>
+                    {{ form.publication_year }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="border-border">
+
+    <section class="space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">Reading Journey</h2>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="{{ form.status.id_for_label }}" class="block mb-2 text-sm font-medium">
+                                Status
+                            </label>
+                            {{ form.status }}
+                        </div>
+                        <div x-show="status !== 'TO_READ'" class="transition-opacity" x-cloak>
+                            <label for="{{ form.started_at.id_for_label }}" class="block mb-2 text-sm font-medium">
+                                Started Date
+                            </label>
+                            {{ form.started_at }}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div x-show="status === 'FINISHED'" class="transition-opacity" x-cloak>
+                            <label for="{{ form.finished_at.id_for_label }}" class="block mb-2 text-sm font-medium">
+                                Finished Date
+                            </label>
+                            {{ form.finished_at }}
+                        </div>
+                        <div x-show="status === 'FINISHED'" class="transition-opacity" x-cloak>
+                            <label class="block mb-2 text-sm font-medium">
+                                Rating
+                            </label>
+                            <div x-data="{
+                                    rating: parseInt('{{ form.overall_rating.value|default:'0' }}') || 0,
+                                    setRating(value) {
+                                        this.rating = this.rating === value ? 0 : value;
+                                        this.$refs.ratingInput.value = this.rating || '';
+                                    },
+                                    clear() {
+                                        this.rating = 0;
+                                        this.$refs.ratingInput.value = '';
+                                    }
+                                }" class="space-y-2">
+                                <input type="hidden"
+                                       id="{{ form.overall_rating.id_for_label }}"
+                                       name="{{ form.overall_rating.html_name }}"
+                                       value="{{ form.overall_rating.value|default:'' }}"
+                                       x-ref="ratingInput">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center">
+                                        <template x-for="star in 5" :key="star">
+                                            <button type="button"
+                                                    class="p-1 text-border transition-colors hover:text-yellow-300"
+                                                    :class="rating >= star ? 'text-yellow-400' : 'text-border'"
+                                                    @click="setRating(star)"
+                                                    :aria-label="`Set rating ${star} star`">
+                                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                                </svg>
+                                            </button>
+                                        </template>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground" x-text="rating ? `${rating}.0 ★` : 'Not rated yet'"></span>
+                                    <button type="button" class="text-xs text-muted-foreground hover:text-foreground" @click="clear()">Clear</button>
+                                </div>
+                            </div>
+                            {% if form.overall_rating.errors %}
+                            <p class="mt-1 text-sm text-destructive">{{ form.overall_rating.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+    </section>
+
+    <hr class="border-border">
+
+    <section class="space-y-4">
+        <h2 class="text-lg font-semibold text-foreground">Media & Tags</h2>
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="{{ form.cover_image.id_for_label }}" class="block mb-2 text-sm font-medium">
+                                    Cover Image
+                                </label>
+                                {% if book and book.cover_image %}
+                                <div class="mb-3">
+                                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-48 w-auto rounded-lg shadow">
+                                </div>
+                                {% endif %}
+                                {{ form.cover_image }}
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium">
+                                    Upload Ebook
+                                </label>
+                                <input type="file"
+                                       name="book_file"
+                                       class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                       accept=".pdf,.epub">
+                                <p class="mt-2 text-xs text-muted-foreground">
+                                    Optional. Attach the main reading file (PDF or EPUB).
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium">
+                                    Additional Attachments
+                                </label>
+                                <input type="file"
+                                       name="attachments"
+                                       multiple
+                                       class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                                <p class="mt-2 text-xs text-muted-foreground">
+                                    Upload notes, summaries, or mindmaps (any format). You can select multiple files.
+                                </p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-sm font-medium">Tags</label>
+                            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {% for choice in form.tags %}
+                    <label for="{{ choice.id_for_label }}" class="flex items-center rounded-lg border border-border px-3 py-2 cursor-pointer hover:border-primary">
+                        {{ choice.tag }}
+                        <span class="ml-2 text-sm text-foreground">{{ choice.choice_label }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <p class="mt-2 text-xs text-muted-foreground">
+                    Need something else? Manage tags via the admin panel.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-end gap-3 pt-6 border-t border-border">
+        {% if is_modal %}
+        <button type="button"
+                class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+                onclick="window.closeBookModal && window.closeBookModal()">
+            Cancel
+        </button>
+        {% else %}
+        <a href="{% if book %}{% url 'book_detail' book.pk %}{% else %}{% url 'library' %}{% endif %}"
+           class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
+            Cancel
+        </a>
+        {% endif %}
+        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            {{ action }} Book
+        </button>
+    </div>
+{% endwith %}

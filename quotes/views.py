@@ -31,7 +31,7 @@ def quotes_list(request):
             Q(quote_text__icontains=search_query) |
             Q(my_comment__icontains=search_query) |
             Q(book__title__icontains=search_query) |
-            Q(book__author__icontains=search_query)
+            Q(book__author__name__icontains=search_query)
         ).distinct()
 
     # Apply sorting

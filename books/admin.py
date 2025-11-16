@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, BookFile
+from .models import Book, BookFile, Author
 
 
 class BookFileInline(admin.TabularInline):
@@ -10,10 +10,16 @@ class BookFileInline(admin.TabularInline):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ['title', 'author', 'status', 'overall_rating', 'user', 'created_at']
-    list_filter = ['status', 'primary_format', 'user', 'created_at']
-    search_fields = ['title', 'author']
+    list_filter = ['status', 'user', 'created_at']
+    search_fields = ['title', 'author__name']
     filter_horizontal = ['tags']
     inlines = [BookFileInline]
+
+
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ['name', 'user', 'created_at']
+    search_fields = ['name', 'user__username']
 
 
 @admin.register(BookFile)

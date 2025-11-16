@@ -62,7 +62,7 @@
         <div class="mb-4">
             <form hx-get="{% url 'library' %}"
                   hx-target="#books-list"
-                  hx-trigger="change, submit"
+                  hx-trigger="change, submit, bookCreated"
                   hx-push-url="true"
                   hx-indicator="#books-loading"
                   class="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/50 px-4 py-3">
@@ -111,7 +111,7 @@
                         <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Recently Updated</option>
                         <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Recently Added</option>
                         <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
-                        <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author (A-Z)</option>
+                        <option value="author__name" {% if sort_by == 'author__name' %}selected{% endif %}>Author (A-Z)</option>
                         <option value="-overall_rating" {% if sort_by == '-overall_rating' %}selected{% endif %}>Rating (High-Low)</option>
                         <option value="-finished_at" {% if sort_by == '-finished_at' %}selected{% endif %}>Recently Finished</option>
                     </select>

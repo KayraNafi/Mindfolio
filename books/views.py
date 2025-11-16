@@ -2,19 +2,63 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
-from django.http import FileResponse, HttpResponseForbidden, Http404
-from .models import Book, BookFile
+from django.http import FileResponse, HttpResponseForbidden, Http404, HttpResponse
+from .models import Book, BookFile, Author
 from notes.models import Note
 from quotes.models import Quote
 from core.models import Tag
 from .forms import BookForm, BookFileForm, NoteForm, QuoteForm
 import mimetypes
+import json
+import os
+
+
+def _author_suggestions(user):
+    return list(
+        Author.objects.filter(user=user)
+        .order_by('name')
+        .values_list('name', flat=True)
+    )
+
+
+def _handle_file_uploads(book, request):
+    """Attach uploaded ebook and supporting files to the given book."""
+    book_file = request.FILES.get('book_file')
+    if book_file:
+        ext = os.path.splitext(book_file.name)[1].lower()
+        if ext == '.pdf':
+            file_type = 'SOURCE_PDF'
+        elif ext == '.epub':
+            file_type = 'SOURCE_EPUB'
+        else:
+            file_type = 'OTHER'
+
+        BookFile.objects.create(
+            book=book,
+            file_type=file_type,
+            file=book_file,
+            original_filename=book_file.name,
+            mime_type=mimetypes.guess_type(book_file.name)[0] or ''
+        )
+
+    for extra in request.FILES.getlist('attachments'):
+        BookFile.objects.create(
+            book=book,
+            file_type='OTHER',
+            file=extra,
+            original_filename=extra.name,
+            mime_type=mimetypes.guess_type(extra.name)[0] or ''
+        )
 
 
 @login_required
 def library_view(request):
     """Main library/dashboard view with filters and search"""
-    books = Book.objects.filter(user=request.user).select_related('user').prefetch_related('tags', 'files')
+    books = (
+        Book.objects.filter(user=request.user)
+        .select_related('user', 'author')
+        .prefetch_related('tags', 'files')
+    )
 
     # Get filter parameters
     status_filter = request.GET.get('status', '')
@@ -22,6 +66,8 @@ def library_view(request):
     rating_filter = request.GET.get('rating', '')
     search_query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', '-updated_at')
+    if sort_by == 'author':
+        sort_by = 'author__name'
 
     # Apply status filter
     if status_filter:
@@ -39,13 +85,13 @@ def library_view(request):
     if search_query:
         books = books.filter(
             Q(title__icontains=search_query) |
-            Q(author__icontains=search_query) |
+            Q(author__name__icontains=search_query) |
             Q(notes__body__icontains=search_query) |
             Q(quotes__quote_text__icontains=search_query)
         ).distinct()
 
     # Apply sorting
-    valid_sort_fields = ['-updated_at', '-created_at', 'title', 'author', '-overall_rating', '-finished_at']
+    valid_sort_fields = ['-updated_at', '-created_at', 'title', 'author__name', '-overall_rating', '-finished_at']
     if sort_by in valid_sort_fields:
         books = books.order_by(sort_by)
     else:
@@ -90,12 +136,29 @@ def book_create(request):
             book.user = request.user
             book.save()
             form.save_m2m()  # Save many-to-many relationships
+            _handle_file_uploads(book, request)
             messages.success(request, f'Book "{book.title}" created successfully!')
+            if request.htmx:
+                response = HttpResponse('')
+                response['HX-Trigger'] = json.dumps({
+                    'bookCreated': {'title': book.title, 'id': book.pk}
+                })
+                return response
             return redirect('book_detail', pk=book.pk)
     else:
         form = BookForm(user=request.user)
 
-    return render(request, 'books/book_form.html', {'form': form, 'action': 'Create'})
+    context = {
+        'form': form,
+        'action': 'Create',
+        'book': None,
+        'author_suggestions': _author_suggestions(request.user),
+    }
+
+    if request.htmx:
+        return render(request, 'books/partials/book_form_modal.html', context)
+
+    return render(request, 'books/book_form.html', context)
 
 
 @login_required
@@ -107,12 +170,20 @@ def book_edit(request, pk):
         form = BookForm(request.POST, request.FILES, instance=book, user=request.user)
         if form.is_valid():
             book = form.save()
+            _handle_file_uploads(book, request)
             messages.success(request, f'Book "{book.title}" updated successfully!')
             return redirect('book_detail', pk=book.pk)
     else:
         form = BookForm(instance=book, user=request.user)
 
-    return render(request, 'books/book_form.html', {'form': form, 'action': 'Edit', 'book': book})
+    context = {
+        'form': form,
+        'action': 'Edit',
+        'book': book,
+        'author_suggestions': _author_suggestions(request.user),
+    }
+
+    return render(request, 'books/book_form.html', context)
 
 
 @login_required
