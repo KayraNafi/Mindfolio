@@ -1,30 +1,43 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static querystring %}
 
 {% block title %}All Quotes - Mindfolio{% endblock %}
 
 {% block content %}
 <div class="py-10">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">All Quotes</h1>
+        <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-foreground">All Quotes</h1>
+                <p class="text-sm text-muted-foreground">Search across every highlight, note, and tagged moment.</p>
+            </div>
+            <span class="text-sm text-muted-foreground">
+                {{ quotes|length }} result{% if quotes|length != 1 %}s{% endif %}
+            </span>
+        </div>
 
         <!-- Filters -->
-        <div class="card p-6 mb-6">
-            <form hx-get="{% url 'quotes_list' %}" hx-target="#quotes-list" hx-trigger="change, submit">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6 mb-6">
+            <form hx-get="{% url 'quotes_list' %}"
+                  hx-target="#quotes-list"
+                  hx-trigger="change, submit"
+                  hx-push-url="true"
+                  hx-indicator="#quotes-loading"
+                  class="space-y-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-5">
                     <div class="sm:col-span-2">
-                        <label for="search" class="label block mb-2">Search</label>
+                        <label for="search" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Search</label>
                         <input type="text"
                                name="q"
                                id="search"
                                value="{{ search_query }}"
                                placeholder="Search quotes..."
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     </div>
 
                     <div>
-                        <label for="book" class="label block mb-2">Book</label>
-                        <select name="book" id="book" class="select">
+                        <label for="book" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Book</label>
+                        <select name="book" id="book" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <option value="">All Books</option>
                             {% for book in books %}
                             <option value="{{ book.id }}" {% if current_book == book.id|stringformat:"s" %}selected{% endif %}>
@@ -35,8 +48,8 @@
                     </div>
 
                     <div>
-                        <label for="tag" class="label block mb-2">Tag</label>
-                        <select name="tag" id="tag" class="select">
+                        <label for="tag" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Tag</label>
+                        <select name="tag" id="tag" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <option value="">All Tags</option>
                             {% for tag in tags %}
                             <option value="{{ tag.id }}" {% if current_tag == tag.id|stringformat:"s" %}selected{% endif %}>
@@ -45,52 +58,93 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div>
+                        <label for="sort" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Sort</label>
+                        <select name="sort" id="sort" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest first</option>
+                            <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Oldest first</option>
+                            <option value="book__title" {% if sort_by == 'book__title' %}selected{% endif %}>Book title</option>
+                            <option value="page_number" {% if sort_by == 'page_number' %}selected{% endif %}>Page number</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Apply filters</button>
+                    <a href="{% url 'quotes_list' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">Reset</a>
                 </div>
             </form>
+
+            {% if search_query or current_book or current_tag or sort_by != '-created_at' %}
+            <div class="mt-4 space-y-2">
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Active filters</p>
+                <div class="flex flex-wrap gap-2">
+                    {% if search_query %}
+                    <a href="{% url 'quotes_list' %}{% querystring_replace q=None %}"
+                       class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                        Search: “{{ search_query }}”
+                        <span class="ml-2 text-muted-foreground">&times;</span>
+                    </a>
+                    {% endif %}
+                    {% if current_book %}
+                        {% for book in books %}
+                            {% if book.id|stringformat:"s" == current_book %}
+                            <a href="{% url 'quotes_list' %}{% querystring_replace book=None %}"
+                               class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                                Book: {{ book.title }}
+                                <span class="ml-2 text-muted-foreground">&times;</span>
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% if current_tag %}
+                        {% for tag in tags %}
+                            {% if tag.id|stringformat:"s" == current_tag %}
+                            <a href="{% url 'quotes_list' %}{% querystring_replace tag=None %}"
+                               class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                                Tag: {{ tag.name }}
+                                <span class="ml-2 text-muted-foreground">&times;</span>
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% if sort_by != '-created_at' %}
+                        {% if sort_by == 'created_at' %}
+                            <a href="{% url 'quotes_list' %}{% querystring_replace sort='-created_at' %}"
+                               class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                                Sort: Oldest
+                                <span class="ml-2 text-muted-foreground">&times;</span>
+                            </a>
+                        {% elif sort_by == 'book__title' %}
+                            <a href="{% url 'quotes_list' %}{% querystring_replace sort='-created_at' %}"
+                               class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                                Sort: Book title
+                                <span class="ml-2 text-muted-foreground">&times;</span>
+                            </a>
+                        {% elif sort_by == 'page_number' %}
+                            <a href="{% url 'quotes_list' %}{% querystring_replace sort='-created_at' %}"
+                               class="inline-flex items-center rounded-full border border-border px-3 py-1 text-xs text-foreground">
+                                Sort: Page number
+                                <span class="ml-2 text-muted-foreground">&times;</span>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="quotes-loading" class="htmx-indicator hidden mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 1010 10h-4a6 6 0 11-6-6z"></path>
+                </svg>
+                Updating quotes…
+            </div>
         </div>
 
         <!-- Quotes List -->
-        <div id="quotes-list">
-            <div class="space-y-6">
-                {% for quote in quotes %}
-                <div class="card p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <a href="{% url 'book_detail' quote.book.pk %}" class="text-sm font-medium text-primary hover:underline">
-                                {{ quote.book.title }}
-                            </a>
-                            <p class="text-xs text-gray-500">by {{ quote.book.author }}</p>
-                        </div>
-                        {% if quote.page_number %}
-                        <span class="badge badge-outline text-xs">Page {{ quote.page_number }}</span>
-                        {% endif %}
-                    </div>
-
-                    <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700 mb-4">
-                        {{ quote.quote_text }}
-                    </blockquote>
-
-                    {% if quote.my_comment %}
-                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                        <p class="text-sm text-gray-700">{{ quote.my_comment }}</p>
-                    </div>
-                    {% endif %}
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-wrap gap-2">
-                            {% for tag in quote.tags.all %}
-                            <span class="badge badge-outline text-xs">{{ tag.name }}</span>
-                            {% endfor %}
-                        </div>
-                        <span class="text-xs text-gray-500">{{ quote.created_at|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center py-12">
-                    <p class="text-gray-500">No quotes found. Start adding quotes to your books!</p>
-                </div>
-                {% endfor %}
-            </div>
+        <div id="quotes-list" aria-live="polite">
+            {% include 'quotes/partials/quote_list.html' %}
         </div>
     </div>
 </div>

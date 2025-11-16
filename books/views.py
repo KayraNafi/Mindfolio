@@ -139,8 +139,10 @@ def book_detail(request, pk):
         user=request.user
     )
 
-    # Get the active tab from query params, default to 'overview'
-    active_tab = request.GET.get('tab', 'overview')
+    # Get the active tab from query params, default to 'notes'
+    active_tab = request.GET.get('tab', 'notes')
+    if active_tab not in {'notes', 'quotes', 'files'}:
+        active_tab = 'notes'
 
     context = {
         'book': book,

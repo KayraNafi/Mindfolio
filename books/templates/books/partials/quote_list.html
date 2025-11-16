@@ -1,35 +1,41 @@
 <div class="space-y-4">
     {% for quote in book.quotes.all %}
-    <div class="card p-4">
-        <div class="flex justify-between items-start mb-2">
+    <div class="p-4 border border-border rounded-lg bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex justify-between items-start mb-3">
             <div class="flex-1">
                 {% if quote.page_number %}
-                <span class="text-xs text-gray-500">Page {{ quote.page_number }}</span>
+                <span class="text-xs text-muted-foreground">Page {{ quote.page_number }}</span>
                 {% endif %}
             </div>
-            <div class="flex gap-2">
-                <a href="{% url 'quote_edit' quote.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
-                <button hx-delete="{% url 'quote_delete' quote.pk %}"
-                        hx-confirm="Are you sure?"
-                        hx-target="closest .space-y-4"
-                        class="text-sm text-red-600 hover:text-red-900">Delete</button>
+            <div class="flex gap-3 text-sm">
+                <a href="{% url 'quote_edit' quote.pk %}" class="text-muted-foreground hover:text-foreground">Edit</a>
+                <form action="{% url 'quote_delete' quote.pk %}" method="post" class="inline" onsubmit="return confirm('Delete this quote?');">
+                    {% csrf_token %}
+                    <button type="submit" class="text-destructive hover:text-destructive/80">Delete</button>
+                </form>
             </div>
         </div>
-        <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700">
-            {{ quote.quote_text }}
+        <blockquote class="border-l-4 border-primary pl-4 italic text-foreground mb-3">
+            "{{ quote.quote_text }}"
         </blockquote>
         {% if quote.my_comment %}
-        <p class="text-sm text-gray-600 mt-3">{{ quote.my_comment }}</p>
+        <p class="text-sm text-muted-foreground mt-2">{{ quote.my_comment }}</p>
         {% endif %}
         {% if quote.tags.all %}
-        <div class="flex flex-wrap gap-1 mt-3">
+        <div class="flex flex-wrap gap-2 mt-3">
             {% for tag in quote.tags.all %}
-            <span class="badge badge-outline text-xs">{{ tag.name }}</span>
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border border-border text-foreground">{{ tag.name }}</span>
             {% endfor %}
         </div>
         {% endif %}
+        <p class="text-xs text-muted-foreground mt-2">{{ quote.created_at|date:"M d, Y" }}</p>
     </div>
     {% empty %}
-    <p class="text-gray-500 text-center py-8">No quotes yet. Add your first quote!</p>
+    <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-muted-foreground mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+        </svg>
+        <p class="text-muted-foreground">No quotes yet. Add your first quote!</p>
+    </div>
     {% endfor %}
 </div>

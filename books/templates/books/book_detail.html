@@ -4,11 +4,17 @@
 {% block title %}{{ book.title }} - Mindfolio{% endblock %}
 
 {% block content %}
-<div class="py-10">
+<div class="py-10"
+     x-data="{
+        activeTab: '{{ active_tab|default:"notes" }}',
+        showNoteModal: false,
+        showQuoteModal: false,
+        showFileModal: false
+     }">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <!-- Back button -->
         <div class="mb-6">
-            <a href="{% url 'library' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <a href="{% url 'library' %}" class="text-sm font-medium text-muted-foreground hover:text-foreground">
                 ← Back to Library
             </a>
         </div>
@@ -16,14 +22,14 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <!-- Left Column - Book Info -->
             <div class="lg:col-span-1">
-                <div class="card sticky top-6">
+                <div class="sticky top-6 rounded-lg border bg-card text-card-foreground shadow-sm">
                     <!-- Cover -->
-                    <div class="aspect-[2/3] w-full overflow-hidden rounded-t-lg bg-gray-200">
+                    <div class="w-full h-80 overflow-hidden rounded-t-lg bg-muted flex items-center justify-center">
                         {% if book.cover_image %}
-                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-full w-full object-cover">
+                        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="max-h-full max-w-full object-contain">
                         {% else %}
-                        <div class="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                            <svg class="h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-border">
+                            <svg class="h-24 w-24 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
                         </div>
@@ -31,23 +37,23 @@
                     </div>
 
                     <div class="p-6">
-                        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ book.title }}</h1>
-                        <p class="text-lg text-gray-600 mb-4">{{ book.author }}</p>
+                        <h1 class="text-2xl font-bold text-foreground mb-2">{{ book.title }}</h1>
+                        <p class="text-lg text-muted-foreground mb-4">{{ book.author }}</p>
 
                         {% if book.publication_year %}
-                        <p class="text-sm text-gray-500 mb-4">Published: {{ book.publication_year }}</p>
+                        <p class="text-sm text-muted-foreground mb-4">Published: {{ book.publication_year }}</p>
                         {% endif %}
 
                         <!-- Status -->
                         <div class="mb-4">
                             {% if book.status == 'READING' %}
-                            <span class="badge badge-default bg-blue-100 text-blue-800">Reading</span>
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">Reading</span>
                             {% elif book.status == 'FINISHED' %}
-                            <span class="badge badge-default bg-green-100 text-green-800">Finished</span>
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Finished</span>
                             {% elif book.status == 'TO_READ' %}
-                            <span class="badge badge-default bg-yellow-100 text-yellow-800">To Read</span>
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">To Read</span>
                             {% elif book.status == 'ABANDONED' %}
-                            <span class="badge badge-default bg-gray-100 text-gray-800">Abandoned</span>
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-gray-100 dark:bg-gray-800/30 text-gray-800 dark:text-gray-300">Abandoned</span>
                             {% endif %}
                         </div>
 
@@ -55,7 +61,7 @@
                         {% if book.overall_rating %}
                         <div class="mb-4">
                             <div class="flex items-center">
-                                <div class="flex text-yellow-400">
+                                <div class="flex text-accent">
                                     {% with book.overall_rating as rating %}
                                     {% for i in "12345" %}
                                         {% if forloop.counter <= rating %}
@@ -63,21 +69,21 @@
                                             <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                                         </svg>
                                         {% else %}
-                                        <svg class="h-5 w-5 fill-current text-gray-300" viewBox="0 0 20 20">
+                                        <svg class="h-5 w-5 fill-current text-muted" viewBox="0 0 20 20">
                                             <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                                         </svg>
                                         {% endif %}
                                     {% endfor %}
                                     {% endwith %}
                                 </div>
-                                <span class="ml-2 text-sm font-medium text-gray-600">{{ book.overall_rating }}</span>
+                                <span class="ml-2 text-sm font-medium text-muted-foreground">{{ book.overall_rating }}</span>
                             </div>
                         </div>
                         {% endif %}
 
                         <!-- Dates -->
                         {% if book.started_at or book.finished_at %}
-                        <div class="mb-4 text-sm text-gray-600 space-y-1">
+                        <div class="mb-4 text-sm text-muted-foreground space-y-1">
                             {% if book.started_at %}
                             <p>Started: {{ book.started_at|date:"M d, Y" }}</p>
                             {% endif %}
@@ -90,21 +96,37 @@
                         <!-- Tags -->
                         {% if book.tags.all %}
                         <div class="mb-4">
-                            <p class="text-xs font-medium text-gray-500 mb-2">Tags</p>
+                            <p class="text-xs font-medium text-muted-foreground mb-2">Tags</p>
                             <div class="flex flex-wrap gap-2">
                                 {% for tag in book.tags.all %}
-                                <span class="badge badge-outline">{{ tag.name }}</span>
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border border-border text-foreground">{{ tag.name }}</span>
                                 {% endfor %}
                             </div>
                         </div>
                         {% endif %}
 
+                        <!-- Quick Stats -->
+                        <div class="grid grid-cols-3 gap-2 mb-4 p-3 bg-muted rounded-lg">
+                            <div class="text-center">
+                                <p class="text-xl font-bold text-foreground">{{ book.notes_count }}</p>
+                                <p class="text-xs text-muted-foreground">Notes</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xl font-bold text-foreground">{{ book.quotes_count }}</p>
+                                <p class="text-xs text-muted-foreground">Quotes</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xl font-bold text-foreground">{{ book.files_count }}</p>
+                                <p class="text-xs text-muted-foreground">Files</p>
+                            </div>
+                        </div>
+
                         <!-- Actions -->
-                        <div class="space-y-2 pt-4 border-t">
-                            <a href="{% url 'book_edit' book.pk %}" class="btn btn-outline w-full">
+                        <div class="space-y-2 pt-4 border-t border-border">
+                            <a href="{% url 'book_edit' book.pk %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring w-full">
                                 Edit Book
                             </a>
-                            <a href="{% url 'book_delete' book.pk %}" class="btn btn-ghost w-full text-red-600 hover:bg-red-50">
+                            <a href="{% url 'book_delete' book.pk %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background border-border hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring w-full text-destructive hover:bg-destructive/10">
                                 Delete Book
                             </a>
                         </div>
@@ -112,170 +134,249 @@
                 </div>
             </div>
 
-            <!-- Right Column - Tabs -->
+            <!-- Right Column - Workspace -->
             <div class="lg:col-span-2">
-                <!-- Tabs -->
-                <div class="card" x-data="{ activeTab: '{{ active_tab }}' }">
-                    <div class="border-b border-gray-200">
-                        <nav class="flex -mb-px" aria-label="Tabs">
-                            <button @click="activeTab = 'overview'"
-                                    :class="activeTab === 'overview' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
-                                Overview
+                <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+                    <div class="border-b border-border px-6 pt-4">
+                        <nav class="flex flex-wrap gap-4 text-sm font-medium" role="tablist">
+                            <button type="button"
+                                    role="tab"
+                                    :class="activeTab === 'notes' ? 'text-foreground border-b-2 border-primary pb-2' : 'text-muted-foreground pb-2 border-b-2 border-transparent hover:text-foreground'"
+                                    :aria-selected="activeTab === 'notes'"
+                                    @click="activeTab = 'notes'">
+                                Notes
                             </button>
-                            <button @click="activeTab = 'notes'"
-                                    :class="activeTab === 'notes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
-                                Notes ({{ book.notes_count }})
+                            <button type="button"
+                                    role="tab"
+                                    :class="activeTab === 'quotes' ? 'text-foreground border-b-2 border-primary pb-2' : 'text-muted-foreground pb-2 border-b-2 border-transparent hover:text-foreground'"
+                                    :aria-selected="activeTab === 'quotes'"
+                                    @click="activeTab = 'quotes'">
+                                Quotes
                             </button>
-                            <button @click="activeTab = 'quotes'"
-                                    :class="activeTab === 'quotes' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
-                                Quotes ({{ book.quotes_count }})
-                            </button>
-                            <button @click="activeTab = 'files'"
-                                    :class="activeTab === 'files' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm">
-                                Files ({{ book.files_count }})
+                            <button type="button"
+                                    role="tab"
+                                    :class="activeTab === 'files' ? 'text-foreground border-b-2 border-primary pb-2' : 'text-muted-foreground pb-2 border-b-2 border-transparent hover:text-foreground'"
+                                    :aria-selected="activeTab === 'files'"
+                                    @click="activeTab = 'files'">
+                                Files
                             </button>
                         </nav>
                     </div>
 
-                    <!-- Tab Content -->
-                    <div class="p-6">
-                        <!-- Overview Tab -->
-                        <div x-show="activeTab === 'overview'" x-cloak>
-                            <h3 class="text-lg font-semibold mb-4">Book Overview</h3>
-                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                <div class="card p-4 bg-gray-50">
-                                    <p class="text-sm text-gray-600">Notes</p>
-                                    <p class="text-2xl font-bold">{{ book.notes_count }}</p>
-                                </div>
-                                <div class="card p-4 bg-gray-50">
-                                    <p class="text-sm text-gray-600">Quotes</p>
-                                    <p class="text-2xl font-bold">{{ book.quotes_count }}</p>
-                                </div>
+                    <div class="p-6" x-show="activeTab === 'notes'" x-cloak>
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-semibold text-foreground">Notes</h2>
+                                <p class="text-sm text-muted-foreground">Capture summaries, reflections, and action items.</p>
                             </div>
-
-                            {% if book.notes.all %}
-                            <div class="mb-6">
-                                <h4 class="text-sm font-medium text-gray-900 mb-3">Latest Reflection</h4>
-                                {% with book.notes.all|first as latest_note %}
-                                <div class="card p-4 bg-gray-50">
-                                    <p class="text-xs text-gray-500 mb-1">{{ latest_note.get_note_type_display }}</p>
-                                    {% if latest_note.title %}
-                                    <p class="font-medium mb-2">{{ latest_note.title }}</p>
-                                    {% endif %}
-                                    <p class="text-sm text-gray-700">{{ latest_note.body|truncatewords:50 }}</p>
-                                </div>
-                                {% endwith %}
-                            </div>
-                            {% endif %}
+                            <button @click="showNoteModal = true" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add Note
+                            </button>
                         </div>
-
-                        <!-- Notes Tab -->
-                        <div x-show="activeTab === 'notes'" x-cloak>
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">Notes</h3>
-                                <a href="{% url 'note_create' book.pk %}" class="btn btn-sm btn-primary">Add Note</a>
-                            </div>
-
-                            <div class="space-y-4">
-                                {% for note in book.notes.all %}
-                                <div class="card p-4">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <div class="flex-1">
-                                            <span class="badge badge-outline text-xs">{{ note.get_note_type_display }}</span>
-                                            {% if note.title %}
-                                            <h4 class="font-medium mt-2">{{ note.title }}</h4>
-                                            {% endif %}
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <a href="{% url 'note_edit' note.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
-                                            <a href="{% url 'note_delete' note.pk %}" class="text-sm text-red-600 hover:text-red-900">Delete</a>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-gray-700 whitespace-pre-line">{{ note.body }}</p>
-                                    <p class="text-xs text-gray-500 mt-2">{{ note.created_at|date:"M d, Y" }}</p>
-                                </div>
-                                {% empty %}
-                                <p class="text-gray-500 text-center py-8">No notes yet. Add your first note!</p>
-                                {% endfor %}
-                            </div>
+                        <div id="notes-panel">
+                            {% include 'books/partials/note_list.html' %}
                         </div>
+                    </div>
 
-                        <!-- Quotes Tab -->
-                        <div x-show="activeTab === 'quotes'" x-cloak>
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">Quotes</h3>
-                                <a href="{% url 'quote_create' book.pk %}" class="btn btn-sm btn-primary">Add Quote</a>
+                    <div class="p-6" x-show="activeTab === 'quotes'" x-cloak>
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-semibold text-foreground">Quotes</h2>
+                                <p class="text-sm text-muted-foreground">Save passages and annotate why they resonate.</p>
                             </div>
-
-                            <div class="space-y-4">
-                                {% for quote in book.quotes.all %}
-                                <div class="card p-4">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <div class="flex-1">
-                                            {% if quote.page_number %}
-                                            <span class="text-xs text-gray-500">Page {{ quote.page_number }}</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <a href="{% url 'quote_edit' quote.pk %}" class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
-                                            <a href="{% url 'quote_delete' quote.pk %}" class="text-sm text-red-600 hover:text-red-900">Delete</a>
-                                        </div>
-                                    </div>
-                                    <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-700">
-                                        {{ quote.quote_text }}
-                                    </blockquote>
-                                    {% if quote.my_comment %}
-                                    <p class="text-sm text-gray-600 mt-3">{{ quote.my_comment }}</p>
-                                    {% endif %}
-                                    {% if quote.tags.all %}
-                                    <div class="flex flex-wrap gap-1 mt-3">
-                                        {% for tag in quote.tags.all %}
-                                        <span class="badge badge-outline text-xs">{{ tag.name }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% empty %}
-                                <p class="text-gray-500 text-center py-8">No quotes yet. Add your first quote!</p>
-                                {% endfor %}
-                            </div>
+                            <button @click="showQuoteModal = true" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add Quote
+                            </button>
                         </div>
+                        <div id="quotes-panel">
+                            {% include 'books/partials/quote_list.html' %}
+                        </div>
+                    </div>
 
-                        <!-- Files Tab -->
-                        <div x-show="activeTab === 'files'" x-cloak>
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">Files</h3>
-                                <a href="{% url 'book_file_upload' book.pk %}" class="btn btn-sm btn-primary">Upload File</a>
+                    <div class="p-6" x-show="activeTab === 'files'" x-cloak>
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-semibold text-foreground">Files</h2>
+                                <p class="text-sm text-muted-foreground">Upload PDFs, summaries, or supporting material.</p>
                             </div>
-
-                            <div class="space-y-3">
-                                {% for file in book.files.all %}
-                                <div class="flex items-center justify-between p-3 card">
-                                    <div class="flex items-center">
-                                        <svg class="h-8 w-8 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">{{ file.original_filename }}</p>
-                                            <p class="text-xs text-gray-500">{{ file.get_file_type_display }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <a href="{% url 'book_file_view' file.pk %}" class="btn btn-sm btn-outline">View</a>
-                                        <a href="{% url 'book_file_delete' file.pk %}" class="btn btn-sm btn-ghost text-red-600">Delete</a>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <p class="text-gray-500 text-center py-8">No files uploaded yet.</p>
-                                {% endfor %}
-                            </div>
+                            <button @click="showFileModal = true" class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Upload File
+                            </button>
+                        </div>
+                        <div id="files-panel">
+                            {% include 'books/partials/file_list.html' %}
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div x-show="showNoteModal"
+         x-cloak
+         x-transition.opacity
+         x-trap.noscroll="showNoteModal"
+         class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         @click.self="showNoteModal = false"
+         @keydown.escape.prevent="showNoteModal = false"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="note-modal-title">
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-foreground" id="note-modal-title">Add Note</h3>
+                <button @click="showNoteModal = false" class="text-muted-foreground hover:text-foreground">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form method="post" action="{% url 'note_create' book.pk %}" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Title (optional)</label>
+                        <input type="text" name="title" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Chapter 3 reflections" autofocus>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Note Type <span class="text-destructive">*</span></label>
+                        <select name="note_type" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <option value="SUMMARY">Summary</option>
+                            <option value="INSIGHT">Insight</option>
+                            <option value="QUESTION">Question</option>
+                            <option value="ACTION_ITEM">Action Item</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Page Start</label>
+                            <input type="number" name="page_start" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g., 24">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Page End</label>
+                            <input type="number" name="page_end" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g., 31">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Note <span class="text-destructive">*</span></label>
+                        <textarea name="body" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" rows="6" placeholder="What did you learn? Why does it matter?" required></textarea>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-4 border-t border-border">
+                        <button type="button" @click="showNoteModal = false" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">Cancel</button>
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Save Note</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Modal -->
+    <div x-show="showQuoteModal"
+         x-cloak
+         x-transition.opacity
+         x-trap.noscroll="showQuoteModal"
+         class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         @click.self="showQuoteModal = false"
+         @keydown.escape.prevent="showQuoteModal = false"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="quote-modal-title">
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-foreground" id="quote-modal-title">Add Quote</h3>
+                <button @click="showQuoteModal = false" class="text-muted-foreground hover:text-foreground">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form method="post" action="{% url 'quote_create' book.pk %}" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Quote <span class="text-destructive">*</span></label>
+                        <textarea name="quote_text" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" rows="4" placeholder="Enter the exact quote from the book..." required autofocus></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Page Number</label>
+                        <input type="number" name="page_number" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="e.g., 127">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Your Comment (optional)</label>
+                        <textarea name="my_comment" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" rows="3" placeholder="Why is this quote significant to you?"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Tags</label>
+                        <div class="space-y-2">
+                            {% for tag in book.user.tags.all %}
+                            <div class="flex items-center">
+                                <input type="checkbox" name="tags" value="{{ tag.id }}" id="quote_tag_{{ tag.id }}" class="mr-2">
+                                <label for="quote_tag_{{ tag.id }}" class="text-sm text-foreground">{{ tag.name }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-4 border-t border-border">
+                        <button type="button" @click="showQuoteModal = false" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">Cancel</button>
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Save Quote</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Modal -->
+    <div x-show="showFileModal"
+         x-cloak
+         x-transition.opacity
+         x-trap.noscroll="showFileModal"
+         class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         @click.self="showFileModal = false"
+         @keydown.escape.prevent="showFileModal = false"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="file-modal-title">
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm w-full max-w-2xl">
+            <div class="p-6 border-b border-border flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-foreground" id="file-modal-title">Upload File</h3>
+                <button @click="showFileModal = false" class="text-muted-foreground hover:text-foreground">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <form method="post" action="{% url 'book_file_upload' book.pk %}" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">File Type</label>
+                        <select name="file_type" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                            <option value="EBOOK">Ebook (PDF, EPUB, MOBI)</option>
+                            <option value="AUDIOBOOK">Audiobook</option>
+                            <option value="NOTE">Notes/Annotations</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">File <span class="text-destructive">*</span></label>
+                        <input type="file" name="file" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required>
+                        <p class="text-xs text-muted-foreground mt-1">PDF, EPUB, MOBI, MP3, and more supported</p>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-4 border-t border-border">
+                        <button type="button" @click="showFileModal = false" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">Cancel</button>
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Upload File</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

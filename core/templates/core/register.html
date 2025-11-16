@@ -22,7 +22,7 @@
         </div>
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div class="card px-4 py-8 sm:px-10">
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm px-4 py-8 sm:px-10">
                 <h3 class="text-xl font-semibold mb-6">Create your account</h3>
 
                 {% if messages %}
@@ -41,7 +41,7 @@
                     {% csrf_token %}
 
                     <div>
-                        <label for="id_username" class="label block mb-2">
+                        <label for="id_username" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                             Username
                         </label>
                         <input type="text"
@@ -49,14 +49,14 @@
                                id="id_username"
                                autocomplete="username"
                                required
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                         <p class="mt-1 text-xs text-gray-500">
                             150 characters or fewer. Letters, digits and @/./+/-/_ only.
                         </p>
                     </div>
 
                     <div>
-                        <label for="id_password1" class="label block mb-2">
+                        <label for="id_password1" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                             Password
                         </label>
                         <input type="password"
@@ -64,14 +64,14 @@
                                id="id_password1"
                                autocomplete="new-password"
                                required
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                         <p class="mt-1 text-xs text-gray-500">
                             Your password must contain at least 8 characters and can't be entirely numeric.
                         </p>
                     </div>
 
                     <div>
-                        <label for="id_password2" class="label block mb-2">
+                        <label for="id_password2" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                             Confirm Password
                         </label>
                         <input type="password"
@@ -79,11 +79,11 @@
                                id="id_password2"
                                autocomplete="new-password"
                                required
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-primary w-full">
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary w-full">
                             Create account
                         </button>
                     </div>
@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="mt-6">
-                        <a href="{% url 'login' %}" class="btn btn-outline w-full">
+                        <a href="{% url 'login' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring w-full">
                             Sign in
                         </a>
                     </div>

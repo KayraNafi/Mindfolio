@@ -1,116 +1,143 @@
 {% if books %}
-<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center">
     {% for book in books %}
-    <a href="{% url 'book_detail' book.pk %}" class="card hover:shadow-lg transition-shadow duration-200">
+    <a href="{% url 'book_detail' book.pk %}"
+       class="group relative w-full max-w-xs flex h-full flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm border-border/70 hover:border-primary hover:shadow-xl transition-all duration-200"
+       aria-label="Open {{ book.title }}">
         <!-- Cover Image -->
-        <div class="aspect-[2/3] w-full overflow-hidden rounded-t-lg bg-gray-200">
+        <div class="relative block w-full h-64 overflow-hidden bg-muted flex items-center justify-center">
             {% if book.cover_image %}
-            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-full w-full object-cover">
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
             {% else %}
-            <div class="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                <svg class="h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
+            <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-border">
+                <span class="text-4xl font-semibold text-muted-foreground">
+                    {{ book.title|slice:":1"|upper }}
+                </span>
             </div>
             {% endif %}
+            <div class="absolute top-3 right-3">
+                {% if book.status == 'READING' %}
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-blue-500/10 text-blue-400">Reading</span>
+                {% elif book.status == 'FINISHED' %}
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-green-500/10 text-green-400">Finished</span>
+                {% elif book.status == 'TO_READ' %}
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-yellow-500/10 text-yellow-400">To Read</span>
+                {% elif book.status == 'ABANDONED' %}
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors bg-gray-500/10 text-gray-300">Abandoned</span>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Book Info -->
-        <div class="p-4">
-            <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">{{ book.title }}</h3>
-            <p class="text-sm text-gray-600 mb-2">{{ book.author }}</p>
+        <div class="flex flex-1 flex-col p-4">
+            <div class="flex-1">
+                <h3 class="font-semibold text-card-foreground line-clamp-2">{{ book.title }}</h3>
+                <p class="text-sm text-muted-foreground mb-3 mt-1">{{ book.author }}</p>
 
-            <!-- Rating -->
-            {% if book.overall_rating %}
-            <div class="flex items-center mb-2">
-                {% with book.overall_rating as rating %}
-                <div class="flex text-yellow-400">
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= rating %}
-                        <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
-                        {% elif forloop.counter|add:"-0.5" == rating %}
-                        <svg class="h-4 w-4" viewBox="0 0 20 20">
-                            <defs>
-                                <linearGradient id="half-{{ book.id }}">
-                                    <stop offset="50%" stop-color="rgb(250 204 21)"/>
-                                    <stop offset="50%" stop-color="rgb(229 231 235)"/>
-                                </linearGradient>
-                            </defs>
-                            <path fill="url(#half-{{ book.id }})" d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
-                        {% else %}
-                        <svg class="h-4 w-4 fill-current text-gray-300" viewBox="0 0 20 20">
-                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
+                    <!-- Rating -->
+                    {% if book.overall_rating %}
+                    <div class="flex items-center mb-3">
+                        {% with book.overall_rating as rating %}
+                        <div class="flex text-yellow-400">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= rating %}
+                                <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                </svg>
+                                {% elif forloop.counter|add:"-0.5" == rating %}
+                                <svg class="h-4 w-4" viewBox="0 0 20 20">
+                                    <defs>
+                                        <linearGradient id="half-{{ book.id }}">
+                                            <stop offset="50%" stop-color="rgb(250 204 21)"/>
+                                            <stop offset="50%" stop-color="rgb(229 231 235)"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path fill="url(#half-{{ book.id }})" d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                </svg>
+                                {% else %}
+                                <svg class="h-4 w-4 fill-current text-gray-700" viewBox="0 0 20 20">
+                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                </svg>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="ml-2 text-sm text-muted-foreground">{{ rating }}</span>
+                        {% endwith %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span title="Notes" class="inline-flex items-center gap-1">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            {{ book.notes_count }}
+                        </span>
+                        <span title="Quotes" class="inline-flex items-center gap-1">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            {{ book.quotes_count }}
+                        </span>
+                        <span title="Files" class="inline-flex items-center gap-1">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            {{ book.files_count }}
+                        </span>
+                    </div>
+
+                    <!-- Tags -->
+                    {% if book.tags.all %}
+                    <div class="mt-3 flex flex-wrap gap-1">
+                        {% for tag in book.tags.all|slice:":3" %}
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border border-border text-foreground">{{ tag.name }}</span>
+                        {% endfor %}
+                        {% if book.tags.count > 3 %}
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors border border-border text-foreground">+{{ book.tags.count|add:"-3" }}</span>
                         {% endif %}
-                    {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                <span class="ml-2 text-sm text-gray-600">{{ rating }}</span>
-                {% endwith %}
-            </div>
-            {% endif %}
 
-            <!-- Status Badge -->
-            <div class="mb-3">
-                {% if book.status == 'READING' %}
-                <span class="badge badge-default bg-blue-100 text-blue-800">Reading</span>
-                {% elif book.status == 'FINISHED' %}
-                <span class="badge badge-default bg-green-100 text-green-800">Finished</span>
-                {% elif book.status == 'TO_READ' %}
-                <span class="badge badge-default bg-yellow-100 text-yellow-800">To Read</span>
-                {% elif book.status == 'ABANDONED' %}
-                <span class="badge badge-default bg-gray-100 text-gray-800">Abandoned</span>
-                {% endif %}
+            <div class="mt-4 text-xs text-muted-foreground">
+                Updated {{ book.updated_at|date:"M d, Y" }}
             </div>
 
-            <!-- Stats -->
-            <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span title="Notes">
-                    <svg class="inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    {{ book.notes_count }}
-                </span>
-                <span title="Quotes">
-                    <svg class="inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                    </svg>
-                    {{ book.quotes_count }}
-                </span>
-                <span title="Files">
-                    <svg class="inline h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    {{ book.files_count }}
-                </span>
+            <div class="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                <button type="button"
+                        class="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 hover:border-primary hover:text-foreground"
+                        title="Add a note"
+                        onclick="event.stopPropagation(); window.location.href='{% url 'note_create' book.pk %}';">
+                    ✍️ Note
+                </button>
+                <button type="button"
+                        class="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 hover:border-primary hover:text-foreground"
+                        title="Capture a quote"
+                        onclick="event.stopPropagation(); window.location.href='{% url 'quote_create' book.pk %}';">
+                    💬 Quote
+                </button>
+                <button type="button"
+                        class="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 hover:border-primary hover:text-foreground"
+                        title="Upload file"
+                        onclick="event.stopPropagation(); window.location.href='{% url 'book_file_upload' book.pk %}';">
+                    📎 File
+                </button>
             </div>
-
-            <!-- Tags -->
-            {% if book.tags.all %}
-            <div class="mt-3 flex flex-wrap gap-1">
-                {% for tag in book.tags.all|slice:":3" %}
-                <span class="badge badge-outline text-xs">{{ tag.name }}</span>
-                {% endfor %}
-                {% if book.tags.count > 3 %}
-                <span class="badge badge-outline text-xs">+{{ book.tags.count|add:"-3" }}</span>
-                {% endif %}
-            </div>
-            {% endif %}
         </div>
     </a>
     {% endfor %}
 </div>
 {% else %}
 <div class="text-center py-12">
-    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="mx-auto h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
     </svg>
-    <h3 class="mt-2 text-sm font-medium text-gray-900">No books found</h3>
-    <p class="mt-1 text-sm text-gray-500">Get started by adding a new book to your library.</p>
+    <h3 class="mt-2 text-sm font-medium text-foreground">No books found</h3>
+    <p class="mt-1 text-sm text-muted-foreground">Get started by adding a new book to your library.</p>
     <div class="mt-6">
-        <a href="{% url 'book_create' %}" class="btn btn-primary">
+        <a href="{% url 'book_create' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>

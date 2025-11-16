@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if quote %}Edit{% else %}Create{% endif %} Quote - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <a href="{% url 'book_detail' book.pk %}"
+               class="text-sm font-medium text-muted-foreground hover:text-foreground">
+                ← Back to {{ book.title }}
+            </a>
+        </div>
+
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-foreground mb-6">
+                {% if quote %}Edit Quote{% else %}Create Quote{% endif %}
+            </h1>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Quote Text -->
+                <div>
+                    <label for="{{ form.quote_text.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Quote <span class="text-destructive">*</span>
+                    </label>
+                    {{ form.quote_text }}
+                    {% if form.quote_text.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.quote_text.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        Enter the exact quote from the book.
+                    </p>
+                </div>
+
+                <!-- Page Number -->
+                <div>
+                    <label for="{{ form.page_number.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Page Number
+                    </label>
+                    {{ form.page_number }}
+                    {% if form.page_number.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.page_number.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        Optional: Specify which page this quote appears on.
+                    </p>
+                </div>
+
+                <!-- My Comment -->
+                <div>
+                    <label for="{{ form.my_comment.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Your Comment
+                    </label>
+                    {{ form.my_comment }}
+                    {% if form.my_comment.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.my_comment.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        Optional: Add your thoughts about when or why this quote is significant.
+                    </p>
+                </div>
+
+                <!-- Tags -->
+                <div>
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Tags</label>
+                    <div class="space-y-2">
+                        {% for choice in form.tags %}
+                        <div class="flex items-center">
+                            {{ choice.tag }}
+                            <label for="{{ choice.id_for_label }}" class="ml-2 text-sm text-foreground">
+                                {{ choice.choice_label }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="mt-2 text-xs text-muted-foreground">
+                        Tag this quote to organize and find it later.
+                    </p>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-6 border-t border-border">
+                    <a href="{% url 'book_detail' book.pk %}"
+                       class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        {% if quote %}Update Quote{% else %}Create Quote{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

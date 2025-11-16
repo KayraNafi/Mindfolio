@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if note %}Edit{% else %}Create{% endif %} Note - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <a href="{% url 'book_detail' book.pk %}"
+               class="text-sm font-medium text-muted-foreground hover:text-foreground">
+                ← Back to {{ book.title }}
+            </a>
+        </div>
+
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-foreground mb-6">
+                {% if note %}Edit Note{% else %}Create Note{% endif %}
+            </h1>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Note Type -->
+                <div>
+                    <label for="{{ form.note_type.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Type
+                    </label>
+                    {{ form.note_type }}
+                    {% if form.note_type.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.note_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Title -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Title (optional)
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.title.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Body -->
+                <div>
+                    <label for="{{ form.body.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        Note Content <span class="text-destructive">*</span>
+                    </label>
+                    {{ form.body }}
+                    {% if form.body.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.body.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        Write your thoughts, insights, or reflections about this book.
+                    </p>
+                </div>
+
+                <!-- Page References -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.page_start.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                            Start Page
+                        </label>
+                        {{ form.page_start }}
+                        {% if form.page_start.errors %}
+                        <p class="mt-1 text-sm text-destructive">{{ form.page_start.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.page_end.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                            End Page
+                        </label>
+                        {{ form.page_end }}
+                        {% if form.page_end.errors %}
+                        <p class="mt-1 text-sm text-destructive">{{ form.page_end.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-6 border-t border-border">
+                    <a href="{% url 'book_detail' book.pk %}"
+                       class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        {% if note %}Update Note{% else %}Create Note{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static querystring %}
 
 {% block title %}Library - Mindfolio{% endblock %}
 
@@ -7,138 +7,129 @@
 <div class="py-10">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-4">
             <div class="min-w-0 flex-1">
-                <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900">
-                    My Library
+                <h1 class="text-3xl font-bold leading-tight tracking-tight text-foreground">
+                    Mindfolio
                 </h1>
             </div>
-        </div>
-
-        <!-- Statistics -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            <div class="card p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            <div class="rounded-2xl border border-border/60 bg-card/70 px-4 py-2 text-sm text-muted-foreground">
+                <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <a href="{% url 'library' %}{% querystring_replace status=None %}"
+                       class="inline-flex items-center gap-2 text-foreground hover:text-primary"
+                       title="Show every book">
+                        <svg class="h-4 w-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/>
                         </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="truncate text-sm font-medium text-gray-500">Total Books</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.total }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        <span class="font-medium">Total:</span>
+                        <span class="font-semibold">{{ stats.total }}</span>
+                    </a>
+                    <span class="text-muted-foreground/70">•</span>
+                    <a href="{% url 'library' %}{% querystring_replace status='READING' %}"
+                       class="inline-flex items-center gap-2 hover:text-primary"
+                       title="Filter by books in progress">
+                        <svg class="h-4 w-4 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6l4 2M4 6h16M4 18h16"/>
                         </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="truncate text-sm font-medium text-gray-500">Reading</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.reading }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <span class="font-medium text-foreground">Reading:</span>
+                        <span class="font-semibold text-foreground">{{ stats.reading }}</span>
+                    </a>
+                    <span class="text-muted-foreground/70">•</span>
+                    <a href="{% url 'library' %}{% querystring_replace status='FINISHED' %}"
+                       class="inline-flex items-center gap-2 hover:text-primary"
+                       title="Filter completed books">
+                        <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="truncate text-sm font-medium text-gray-500">Finished</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.finished }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-10 w-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                        <span class="font-medium text-foreground">Finished:</span>
+                        <span class="font-semibold text-foreground">{{ stats.finished }}</span>
+                    </a>
+                    <span class="text-muted-foreground/70">•</span>
+                    <a href="{% url 'library' %}{% querystring_replace status='TO_READ' %}"
+                       class="inline-flex items-center gap-2 hover:text-primary"
+                       title="Filter your backlog">
+                        <svg class="h-4 w-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-7 4h8m-9 4h10m-11 4h12"/>
                         </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="truncate text-sm font-medium text-gray-500">To Read</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ stats.to_read }}</dd>
-                        </dl>
-                    </div>
+                        <span class="font-medium text-foreground">To Read:</span>
+                        <span class="font-semibold text-foreground">{{ stats.to_read }}</span>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Filters and Search -->
-        <div class="card p-6 mb-6">
-            <form hx-get="{% url 'library' %}" hx-target="#books-list" hx-trigger="change, submit" hx-push-url="true">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                    <!-- Search -->
-                    <div class="lg:col-span-2">
-                        <label for="search" class="label block mb-2">Search</label>
-                        <input type="text"
-                               name="q"
-                               id="search"
-                               value="{{ search_query }}"
-                               placeholder="Search books, notes, quotes..."
-                               class="input">
+        <!-- Filters Toolbar -->
+        <div class="mb-4">
+            <form hx-get="{% url 'library' %}"
+                  hx-target="#books-list"
+                  hx-trigger="change, submit"
+                  hx-push-url="true"
+                  hx-indicator="#books-loading"
+                  class="flex flex-wrap items-center gap-3 rounded-2xl border border-border/60 bg-card/50 px-4 py-3">
+                <div class="flex min-w-[240px] flex-1">
+                    <label for="search" class="sr-only">Search</label>
+                    <input type="text"
+                           name="q"
+                           id="search"
+                           value="{{ search_query }}"
+                           placeholder="Search books, notes, quotes..."
+                           class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                </div>
+                <div>
+                    <label for="status" class="sr-only">Status</label>
+                    <select name="status" id="status" class="flex h-10 w-[160px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">All status</option>
+                        <option value="TO_READ" {% if current_status == 'TO_READ' %}selected{% endif %}>To Read</option>
+                        <option value="READING" {% if current_status == 'READING' %}selected{% endif %}>Reading</option>
+                        <option value="FINISHED" {% if current_status == 'FINISHED' %}selected{% endif %}>Finished</option>
+                        <option value="ABANDONED" {% if current_status == 'ABANDONED' %}selected{% endif %}>Abandoned</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="tag" class="sr-only">Tag</label>
+                    <select name="tag" id="tag" class="flex h-10 w-[150px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">All tags</option>
+                        {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if current_tag == tag.id|stringformat:"s" %}selected{% endif %}>
+                            {{ tag.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="rating" class="sr-only">Rating</label>
+                    <select name="rating" id="rating" class="flex h-10 w-[150px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="">All ratings</option>
+                        <option value="4" {% if current_rating == '4' %}selected{% endif %}>4+ stars</option>
+                        <option value="3" {% if current_rating == '3' %}selected{% endif %}>3+ stars</option>
+                        <option value="2" {% if current_rating == '2' %}selected{% endif %}>2+ stars</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="sort" class="sr-only">Sort order</label>
+                    <select name="sort" id="sort" class="flex h-10 w-[170px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Recently Updated</option>
+                        <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Recently Added</option>
+                        <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                        <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author (A-Z)</option>
+                        <option value="-overall_rating" {% if sort_by == '-overall_rating' %}selected{% endif %}>Rating (High-Low)</option>
+                        <option value="-finished_at" {% if sort_by == '-finished_at' %}selected{% endif %}>Recently Finished</option>
+                    </select>
+                </div>
+                <div class="ml-auto flex items-center gap-3 text-sm">
+                    <div id="books-loading" class="htmx-indicator hidden items-center gap-2 text-muted-foreground">
+                        <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 1010 10h-4a6 6 0 11-6-6z"></path>
+                        </svg>
+                        Updating…
                     </div>
-
-                    <!-- Status Filter -->
-                    <div>
-                        <label for="status" class="label block mb-2">Status</label>
-                        <select name="status" id="status" class="select">
-                            <option value="">All Status</option>
-                            <option value="TO_READ" {% if current_status == 'TO_READ' %}selected{% endif %}>To Read</option>
-                            <option value="READING" {% if current_status == 'READING' %}selected{% endif %}>Reading</option>
-                            <option value="FINISHED" {% if current_status == 'FINISHED' %}selected{% endif %}>Finished</option>
-                            <option value="ABANDONED" {% if current_status == 'ABANDONED' %}selected{% endif %}>Abandoned</option>
-                        </select>
-                    </div>
-
-                    <!-- Tag Filter -->
-                    <div>
-                        <label for="tag" class="label block mb-2">Tag</label>
-                        <select name="tag" id="tag" class="select">
-                            <option value="">All Tags</option>
-                            {% for tag in tags %}
-                            <option value="{{ tag.id }}" {% if current_tag == tag.id|stringformat:"s" %}selected{% endif %}>
-                                {{ tag.name }} ({{ tag.book_count }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Sort -->
-                    <div>
-                        <label for="sort" class="label block mb-2">Sort By</label>
-                        <select name="sort" id="sort" class="select">
-                            <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Recently Updated</option>
-                            <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Recently Added</option>
-                            <option value="title" {% if sort_by == 'title' %}selected{% endif %}>Title (A-Z)</option>
-                            <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author (A-Z)</option>
-                            <option value="-overall_rating" {% if sort_by == '-overall_rating' %}selected{% endif %}>Rating (High-Low)</option>
-                        </select>
-                    </div>
+                    <a href="{% url 'library' %}" class="text-muted-foreground hover:text-foreground">Clear filters</a>
                 </div>
             </form>
         </div>
-
         <!-- Books Grid -->
-        <div id="books-list">
+        <div id="books-list" aria-live="polite">
             {% include 'books/partials/book_list.html' %}
         </div>
     </div>

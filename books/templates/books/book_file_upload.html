@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload File - Mindfolio{% endblock %}
+
+{% block content %}
+<div class="py-10">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <a href="{% url 'book_detail' book.pk %}"
+               class="text-sm font-medium text-muted-foreground hover:text-foreground">
+                ← Back to {{ book.title }}
+            </a>
+        </div>
+
+        <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+            <h1 class="text-2xl font-bold text-foreground mb-6">Upload File</h1>
+
+            <p class="text-sm text-muted-foreground mb-6">
+                Upload PDF, EPUB, or other files related to "{{ book.title }}".
+            </p>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- File Type -->
+                <div>
+                    <label for="{{ form.file_type.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        File Type
+                    </label>
+                    {{ form.file_type }}
+                    {% if form.file_type.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.file_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- File -->
+                <div>
+                    <label for="{{ form.file.id_for_label }}" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+                        File <span class="text-destructive">*</span>
+                    </label>
+                    {{ form.file }}
+                    {% if form.file.errors %}
+                    <p class="mt-1 text-sm text-destructive">{{ form.file.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-1 text-xs text-muted-foreground">
+                        Supported formats: PDF, EPUB, MOBI, TXT, MP3, and more.
+                    </p>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-between pt-6 border-t border-border">
+                    <a href="{% url 'book_detail' book.pk %}"
+                       class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Upload File
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

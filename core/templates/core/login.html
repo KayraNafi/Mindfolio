@@ -22,7 +22,7 @@
         </div>
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div class="card px-4 py-8 sm:px-10">
+            <div class="rounded-lg border bg-card text-card-foreground shadow-sm px-4 py-8 sm:px-10">
                 <h3 class="text-xl font-semibold mb-6">Sign in to your account</h3>
 
                 {% if messages %}
@@ -41,7 +41,7 @@
                     {% csrf_token %}
 
                     <div>
-                        <label for="id_username" class="label block mb-2">
+                        <label for="id_username" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                             Username
                         </label>
                         <input type="text"
@@ -49,11 +49,11 @@
                                id="id_username"
                                autocomplete="username"
                                required
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     </div>
 
                     <div>
-                        <label for="id_password" class="label block mb-2">
+                        <label for="id_password" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
                             Password
                         </label>
                         <input type="password"
@@ -61,11 +61,11 @@
                                id="id_password"
                                autocomplete="current-password"
                                required
-                               class="input">
+                               class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-primary w-full">
+                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-primary-foreground transition-colors duration-200 rounded-md bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary w-full">
                             Sign in
                         </button>
                     </div>
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="mt-6">
-                        <a href="{% url 'register' %}" class="btn btn-outline w-full">
+                        <a href="{% url 'register' %}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-200 border rounded-md bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring w-full">
                             Create account
                         </a>
                     </div>
